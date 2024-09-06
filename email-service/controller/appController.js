@@ -1,68 +1,38 @@
-const nodemailer = require('nodemailer');
-const Mailgen = require('mailgen');
-const sendEmailService=require('../Services/sendEmailService.js');
-const emailTemplate=require('../Utilities/emailTemplate.js');
+const nodemailer = require("nodemailer");
+module.exports = async function sendEmailService({
+  to,
+  subject,
+  message,
+  attachments = [],
+} = {}) {
+  // Ensure recipient is provided
+  if (!to) {
+    throw new Error("Recipient email address is required.");
+  }
 
-const { use } = require('../routes/routs.js');
+  // Nodemailer configuration
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: `${process.env.EMAIL}`,
+      pass: `${process.env.PASSWORD}`,
+    },
+  });
 
-/** send mail from testing account */
-const signup = async (req, res) => {
-
-    let testAccount = await nodemailer.createTestAccount();
-
-    let transporter = nodemailer.createTransport({
-        host: "smtp.ethereal.email",
-        port: 587,
-        secure: false, 
-        auth: {
-            user: testAccount.user, 
-            pass: testAccount.pass, 
-        },
+  try {
+    const emailInfo = await transporter.sendMail({
+      from: `"HOME SHOPPING 🛒" <am6945g@gmail.com>`, // Verify the 'from' address
+      to: to, // Ensure this is not empty
+      subject: subject || "Hello", // Provide fallback subject
+      html: message || "", // Ensure the message is not empty
+      attachments,
     });
 
-    let message = {
-        from: `"HOME SHOPPING 🛒"${EMAIL}`,
-        to: "amanyalsayed919@gmail.com",
-        subject: "Hello ✔", 
-        text: "Successfully Register with us.", 
-        html: "<b>Successfully Register with us.</b>",
-    }
+    console.log("Email sent successfully:", emailInfo);
 
-
-    transporter.sendMail(message).then((info) => {
-        return res.status(201)
-            .json({
-                msg: "you should receive an email",
-                info: info.messageId,
-                preview: nodemailer.getTestMessageUrl(info)
-            })
-    }).catch(error => {
-        return res.status(500).json({ error })
-    })
-
-    console.log('dwsdwd');
-    // res.status(201).json("Signup Successfully...!");
-}
-
-/** send mail from real gmail account */
-const getbill = (req, res) => {
-
-    const { userEmail } = 'amanyalsayed919@gmail.com';
-    
-    const isEmailsent = sendEmailService({
-        to: userEmail,
-        subject: "Confirm Email",
-        message: emailTemplate({
-            link: "Email Verfied",
-            linkData: "click here to confirm your email",
-            subject: "Email Confirmation",
-        }),
-    });
-
-    res.status(201).json("getBill Successfully...!");
-}
-
-module.exports = {
-   signup,
-   getbill
-}
+    return emailInfo.accepted.length > 0;
+  } catch (error) {
+    console.error("Error sending email:", error);
+    throw error;
+  }
+};
