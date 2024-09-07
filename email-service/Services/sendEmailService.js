@@ -21,10 +21,10 @@ module.exports = async function sendEmailService({
 
   try {
     const emailInfo = await transporter.sendMail({
-      from: `"HOME SHOPPING 🛒" <am6945g@gmail.com>`, // Verify the 'from' address
-      to: to, // Ensure this is not empty
-      subject: subject || "Hello", // Provide fallback subject
-      html: message || "", // Ensure the message is not empty
+      from: `"HOME SHOPPING 🛒"  ${ process.env.EMAIL }`,
+      to: to,
+      subject: subject || "Hello", 
+      html: message || "", 
       attachments,
     });
 

@@ -1,38 +1,79 @@
 const nodemailer = require("nodemailer");
-module.exports = async function sendEmailService({
-  to,
-  subject,
-  message,
-  attachments = [],
-} = {}) {
-  // Ensure recipient is provided
-  if (!to) {
-    throw new Error("Recipient email address is required.");
-  }
+const Mailgen = require("mailgen");
+const sendEmailService = require("../Services/sendEmailService.js");
+const emailTemplate = require("../Utilities/emailTemplate.js");
 
-  // Nodemailer configuration
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
+
+/** send mail from testing account */
+const signup = async (req, res) => {
+  let testAccount = await nodemailer.createTestAccount();
+  const userEmail = req.body.email || req.user.email;
+  let transporter = nodemailer.createTransport({
+    host: "smtp.ethereal.email",
+    port: 587,
+    secure: false,
     auth: {
-      user: `${process.env.EMAIL}`,
-      pass: `${process.env.PASSWORD}`,
+      user: testAccount.user,
+      pass: testAccount.pass,
     },
   });
 
-  try {
-    const emailInfo = await transporter.sendMail({
-      from: `"HOME SHOPPING 🛒" <am6945g@gmail.com>`, // Verify the 'from' address
-      to: to, // Ensure this is not empty
-      subject: subject || "Hello", // Provide fallback subject
-      html: message || "", // Ensure the message is not empty
-      attachments,
+  let message = {
+    from: `"HOME SHOPPING 🛒"${EMAIL}`,
+    to: userEmail,
+    subject: "Hello ✔",
+    text: "Successfully Register with us.",
+    html: "<b>Successfully Register with us.</b>",
+  };
+
+  transporter
+    .sendMail(message)
+    .then((info) => {
+      return res.status(201).json({
+        msg: "you should receive an email",
+        info: info.messageId,
+        preview: nodemailer.getTestMessageUrl(info),
+      });
+    })
+    .catch((error) => {
+      return res.status(500).json({ error });
     });
 
-    console.log("Email sent successfully:", emailInfo);
+  console.log("dwsdwd");
+  // res.status(201).json("Signup Successfully...!");
+};
 
-    return emailInfo.accepted.length > 0;
-  } catch (error) {
-    console.error("Error sending email:", error);
-    throw error;
+/** send mail from real gmail account */
+const getMail = async (req, res) => {
+  const userEmail = req.body.email || req.user.email; 
+
+  try {
+    // Call the sendEmailService function and log the result
+    const isEmailSent = await sendEmailService({
+      to: userEmail, 
+      subject: "Confirm Email",
+      message: emailTemplate({
+        link: "Email Verified",
+        linkData: "click here to confirm your email",
+        subject: "Email Confirmation",
+      }),
+    });
+
+    console.log("Email sent successfully:", isEmailSent); 
+
+    // Send a response based on whether the email was sent
+    if (isEmailSent) {
+      return res.status(201).json("Email sent successfully!");
+    } else {
+      return res.status(500).json("Failed to send email.");
+    }
+  } catch (err) {
+    console.error("Error in sending email:", err); 
+    res.status(500).json({ error: "An error occurred while sending email." });
   }
+};
+
+module.exports = {
+  signup,
+  getMail,
 };
