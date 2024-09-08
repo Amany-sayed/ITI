@@ -4,7 +4,7 @@ let productSchema = mongoose.Schema({
   id: { type: Number, required: true },
   title: { type: String, required: true },
   description: String,
-  category: String,
+  category: String,  
   price: { type: Number, required: true },
   discountPercentage: { type: Number, default: 0 },
   rating: { type: Number, min: 0, max: 5 },
