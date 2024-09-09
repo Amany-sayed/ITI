@@ -12,6 +12,7 @@ const MattressRouts=require('./routes/Mattress.js');
 const CoffeeRouts=require('./routes/CoffeeMakers.js');
 const StickVacRouts=require('./routes/StickVacuums.js');
 const EMachinesRouts=require('./routes/ElectricMachines.js');
+const ProductRouts =require('./routes/productsRouting.js');
 const cartRouts = require('./routes/cartRouting.js');
 const app = express();
 const uri = "mongodb+srv://amany:uVPPJrUv66kKjXyG@cluster0.ptd1n.mongodb.net/Products";
@@ -26,6 +27,7 @@ app.use(express.json());
 /** Routes */
 app.use('/api', appRoute);
 app.use('/cart', cartRouts);
+app.use('/product', ProductRouts);
 app.use('/inBath', BathRouts);  
 app.use('/mattress', MattressRouts);  
 app.use('/blender', BlenderRouts);  
@@ -51,6 +53,7 @@ app.listen(PORT, () => {
 
 
 // http://localhost:3000/mattress/getAllMattress
+// http://localhost:3000/product/getAllProducts
 // http://localhost:3000/blender/getAllBlenders
 // http://localhost:3000/inBath/getAllBaths
 // http://localhost:3000/candle/getAllCandles
@@ -59,3 +62,10 @@ app.listen(PORT, () => {
 // http://localhost:3000/cookingtools/getAllCookings
 // http://localhost:3000/coffee/getAllCoffees
 // http://localhost:3000/stick/getAllStickVacs
+// http://localhost:3000/cart/showCart
+// http://localhost:3000/cart/updateCart
+// http://localhost:3000/cart/addtocart
+// http://localhost:3000/cart/deleteFromCart
+// http://localhost:3000/api/getMail
+// http://localhost:3000/api/signup
+// http://localhost:3000/api/login

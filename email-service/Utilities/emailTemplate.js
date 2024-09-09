@@ -182,14 +182,13 @@ img,p{margin:0;Margin:0;font-family:Lato,BlinkMacSystemFont,Segoe UI,Helvetica N
 </td></tr><tr><td><div class="t12" style="mso-line-height-rule:exactly;mso-line-height-alt:35px;line-height:35px;font-size:1px;display:block;">&nbsp;&nbsp;</div></td></tr><tr><td align="left">
 <table class="t14" role="presentation" cellpadding="0" cellspacing="0" style="Margin-right:auto;">
 <tr>
-<!--[if mso]>
-<td width="105" class="t13" style="background-color:#000000;overflow:hidden;text-align:center;line-height:34px;mso-line-height-rule:exactly;mso-text-raise:6px;border-radius:40px 40px 40px 40px;">
-<![endif]-->
-<!--[if !mso]>-->
-<td class="t13" style="background-color:#000000;overflow:hidden;width:105px;text-align:center;line-height:34px;mso-line-height-rule:exactly;mso-text-raise:6px;border-radius:40px 40px 40px 40px;">
-<!--<![endif]-->
-<span class="t11" style="display:block;margin:0;Margin:0;font-family:Inter Tight,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:34px;font-weight:900;font-style:normal;font-size:13px;text-decoration:none;text-transform:uppercase;direction:ltr;color:#FFFFFF;text-align:center;mso-line-height-rule:exactly;mso-text-raise:6px;">Confirm</span></td>
-</tr></table>
+    <td class="t13" style="background-color:#000000;overflow:hidden;width:105px;text-align:center;line-height:34px;mso-line-height-rule:exactly;mso-text-raise:6px;border-radius:40px 40px 40px 40px;">
+        <a href="http://localhost:3000" style="display:block;text-decoration:none;">
+            <span class="t11" style="display:block;margin:0;Margin:0;font-family:Inter Tight,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:34px;font-weight:900;font-style:normal;font-size:13px;text-decoration:none;text-transform:uppercase;direction:ltr;color:#FFFFFF;text-align:center;mso-line-height-rule:exactly;mso-text-raise:6px;">Confirm</span>
+        </a>
+    </td>
+</tr>
+</table>
 </td></tr><tr><td><div class="t17" style="mso-line-height-rule:exactly;mso-line-height-alt:35px;line-height:35px;font-size:1px;display:block;">&nbsp;&nbsp;</div></td></tr><tr><td align="center">
 <table class="t19" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;">
 <tr>
@@ -199,7 +198,7 @@ img,p{margin:0;Margin:0;font-family:Lato,BlinkMacSystemFont,Segoe UI,Helvetica N
 <!--[if !mso]>-->
 <td class="t18" style="width:400px;">
 <!--<![endif]-->
-<p class="t16" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:21px;font-weight:400;font-style:normal;font-size:16px;text-decoration:none;text-transform:none;letter-spacing:-0.64px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;">Didn&#39;t register on Home Shopping.com? <a class="t15" href="https://tabular.email" style="margin:0;Margin:0;font-weight:700;font-style:normal;text-decoration:none;direction:ltr;color:#2F353D;mso-line-height-rule:exactly;" target="_blank">Click here to let us know.</a></p></td>
+<p class="t16" style="margin:0;Margin:0;font-family:Albert Sans,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:21px;font-weight:400;font-style:normal;font-size:16px;text-decoration:none;text-transform:none;letter-spacing:-0.64px;direction:ltr;color:#333333;text-align:left;mso-line-height-rule:exactly;mso-text-raise:2px;">Didn&#39;t register on Home Shopping.com? <a class="t15" href="http//localhost:3000/api/signup" style="margin:0;Margin:0;font-weight:700;font-style:normal;text-decoration:none;direction:ltr;color:#2F353D;mso-line-height-rule:exactly;" target="http//localhost:3000/api/signup">Click here to Register.</a></p></td>
 </tr></table>
 </td></tr><tr><td align="center">
 <table class="t73" role="presentation" cellpadding="0" cellspacing="0" style="Margin-left:auto;Margin-right:auto;">

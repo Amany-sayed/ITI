@@ -35,7 +35,7 @@ Router.get('/:category', async (req, res) => {
 
 
 // Route to get a single product by ID
-Router.get('/:id', (req, res) => {
+Router.get('/:category/:id', (req, res) => {
     const { id } = req.params;
 
     Product.findById(id)
