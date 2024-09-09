@@ -1,9 +1,10 @@
-const nodemailer = require("nodemailer");
+const jwt = require("jsonwebtoken");
+const { hash } = require("bcrypt");
 const sendEmailService = require("../../Services/sendEmailService.js");
 const emailTemplate = require("../../Utilities/emailTemplate.js");
 const User = require("../../Models/User.model.js");
-const { hash, compare } = require("bcrypt");
-/** send mail from testing account */
+
+/** Signup function */
 const signup = async (req, res) => {
   try {
     const {
@@ -16,136 +17,164 @@ const signup = async (req, res) => {
       country,
       phoneNumber,
     } = req.body;
+
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ message: "Email already exists" });
+
     user = await User.findOne({ userName });
-    if (user)
-      return res.status(400).json({ message: "Username already exists" });
-    if (password !== repeatedPassword)
-      return res.status(400).json({ message: "Passwords do not match" });
+    if (user) return res.status(400).json({ message: "Username already exists" });
+
+    if (password !== repeatedPassword) return res.status(400).json({ message: "Passwords do not match" });
     const hashedPassword = await hash(password, 10);
-    const newUser = await User.create(
-      {
-        email,
-        password: hashedPassword,
-        firstName,
-        lastName,
-        userName,
-        country,
-        phoneNumber,
-      },
-      { new: true }
+
+    const newUser = await User.create({
+      email,
+      password: hashedPassword,
+      firstName,
+      lastName,
+      userName,
+      country,
+      phoneNumber,
+    });
+
+    // Generate email verification token
+    const emailVerificationToken = jwt.sign(
+      { userId: newUser._id, email: newUser.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
     );
-    console.log(newUser);
-    return res
-      .status(201)
-      .json({ message: "User created successfully", newUser });
+
+    const emailVerificationLink = `http://localhost:3000/verify-email?token=${emailVerificationToken}`;
+
+    // Send verification email
+    const isEmailSent = await getMail(email, emailVerificationLink);
+
+    if (!isEmailSent) {
+      return res.status(500).json({ message: "Failed to send confirmation email." });
+    }
+
+    return res.status(201).json({ message: "User created successfully, please check your email to confirm." });
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
 };
 
-// MARK: login
-const logIn = async (req, res, next) => {
+//  login
+const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Check if the user exists
-    const user = await userModel.findOne({ email });
+    let user = await User.findOne({ email });
     if (!user) {
-      return next(new Error("Email not found", { cause: 404 }));
+      return res.status(400).json({ message: "User not found" });
     }
 
-    // Verify the password
-    if (!pkg.compareSync(password, user.password)) {
-      return next(new Error("Password not correct", { cause: 400 }));
+    if (!user.isConfirmed) {
+      return res.status(400).json({ message: "Please confirm your email before logging in" });
     }
 
-    // Generate a token
-    const token = generateToken({
-      payload: {
-        email,
-        _id: user._id,
-        role: user.role,
-      },
-      signature: process.env.SIGN_IN_TOKEN_SECRET,
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
 
-    // Update user status and token
-    const updatedUser = await userModel.findOneAndUpdate(
-      { email },
-      { token, status: "online" },
-      { new: true }
-    );
 
-    // Set up email transporter
-    let testAccount = await nodemailer.createTestAccount();
-    let transporter = nodemailer.createTransport({
-      host: "smtp.ethereal.email",
-      port: 587,
-      secure: false,
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
+    return res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        userName: user.userName,
+        country: user.country,
+        phoneNumber: user.phoneNumber,
       },
     });
-
-    // Create email message
-    let message = {
-      from: `"HOME SHOPPING 🛒" <${process.env.EMAIL}>`,
-      to: email,
-      subject: "Login Successful ✔",
-      text: "You have successfully logged in.",
-      html: "<b>You have successfully logged in to your account.</b>",
-    };
-
-    // Send the email
-    await transporter.sendMail(message);
-
-    // Return response with updated user data and preview URL for the email
-    return res.status(200).json({
-      message: "User logged in",
-      updatedUser,
-      emailPreview: nodemailer.getTestMessageUrl(info),
-    });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
   }
 };
 
-/** send mail from real gmail account */
-const getMail = async (req, res) => {
-  const userEmail = "amanyalsayed919@gmail.com"; // Correct the variable assignment
+const logout = (req, res) => {
+  res.status(200).json({ message: "Logout successful" });
+};
 
+/** send mail from real gmail account */
+const getMail = async (email, verificationLink) => {
   try {
-    // Call the sendEmailService function and log the result
     const isEmailSent = await sendEmailService({
-      to: userEmail, // Use the correct email
-      subject: "Confirm Email",
+      to: email,
+      subject: "Confirm your Email",
       message: emailTemplate({
-        link: "Email Verified",
-        linkData: "click here to confirm your email",
+        link: verificationLink,
+        linkData: "Click here to confirm your email",
         subject: "Email Confirmation",
       }),
     });
 
-    console.log("Email sent successfully:", isEmailSent); // Log the success/failure
-
-    // Send a response based on whether the email was sent
-    if (isEmailSent) {
-      return res.status(201).json("Email sent successfully!");
-    } else {
-      return res.status(500).json("Failed to send email.");
-    }
+    console.log("Email sent successfully:", isEmailSent);
+    return isEmailSent;
   } catch (err) {
-    console.error("Error in sending email:", err); // Log the error for debugging
-    res.status(500).json({ error: "An error occurred while sending email." });
+    console.error("Error in sending email:", err);
+    return false; 
   }
-};
+}
 
 module.exports = {
   signup,
   getMail,
-  logIn,
+  login,
+  logout,
 };
+
+// const signup = async (req, res) => {
+//   try {
+//     const {
+//       email,
+//       password,
+//       repeatedPassword,
+//       firstName,
+//       lastName,
+//       userName,
+//       country,
+//       phoneNumber,
+//     } = req.body;
+
+//     // Check if the email already exists
+//     let user = await User.findOne({ email });
+//     if (user) return res.status(400).json({ message: "Email already exists" });
+
+//     // Check if the username already exists
+//     user = await User.findOne({ userName });
+//     if (user) return res.status(400).json({ message: "Username already exists" });
+
+//     // Check if passwords match
+//     if (password !== repeatedPassword)
+//       return res.status(400).json({ message: "Passwords do not match" });
+
+//     // Hash the password
+//     const hashedPassword = await hash(password, 10);
+
+//     // Create new user
+//     const newUser = await User.create({
+//       email,
+//       password: hashedPassword,
+//       firstName,
+//       lastName,
+//       userName,
+//       country,
+//       phoneNumber,
+//     });
+
+//     console.log(newUser);
+//     return res.status(201).json({ message: "User created successfully", newUser });
+//   } catch (e) {
+//     return res.status(500).json({ error: e.message });
+//   }
+// };
