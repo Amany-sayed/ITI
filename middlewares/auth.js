@@ -49,10 +49,9 @@ const isAuth = () => {
             {
               email: user.email,
               firstname: user.firstname,
-              username: user.username,
               userId: user._id,
             },
-            process.env.SIGN_IN_TOKEN_SECRET,
+            `${process.env.JWT_SECRET}`,
             { expiresIn: "2h" }
           );
 

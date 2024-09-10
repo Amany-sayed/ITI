@@ -1,9 +1,15 @@
+const isAuth = require("../../middlewares/auth.js");
 const router = require("express").Router();
-const { deleteBrand, addBrand, updateBrand, getBrand } = require("../Brand/brand.controller.js");
+const {
+  deleteBrand,
+  addBrand,
+  updateBrand,
+  getBrand,
+} = require("../Brand/brand.controller.js");
 
-router.post("/brands", addBrand);
-router.put("/brands/:brandId", updateBrand);
-router.delete("/brands/:brandId", deleteBrand);
-router.get("/brands/:brandId", getBrand);
+router.post("/add", isAuth(), addBrand);
+router.put("/update/:brandId", isAuth(), updateBrand);
+router.delete("/delete/:brandId", isAuth(), deleteBrand);
+router.get("/:brandId", isAuth(), getBrand);
 
 module.exports = router;

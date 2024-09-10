@@ -21,4 +21,4 @@ const RatingSchema = new Schema({
   },
 });
 const Rating = model("Rating", RatingSchema);
-exports.Rating = Rating;
+module.exports = Rating;

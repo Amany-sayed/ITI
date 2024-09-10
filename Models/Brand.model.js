@@ -12,16 +12,16 @@ const BrandSchema = new Schema({
     type: String,
     required: true,
   },
-  Category: {
+  category: {
     type: Schema.Types.ObjectId,
     ref: "Category",
     required: true,
   },
-  SubCategory: {
+  subCategory: {
     type: Schema.Types.ObjectId,
     ref: "SubCategory",
     required: true,
   },
 });
 const Brand = model("Brand", BrandSchema);
-exports.Brand = Brand;
+module.exports = Brand;

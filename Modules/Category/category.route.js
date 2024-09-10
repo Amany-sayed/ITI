@@ -1,9 +1,15 @@
 const router = require("express").Router();
-const { addCategory, updateCategory, getAllCategories, deleteCategory } = require("./category.controller.js");
+const isAuth = require("../../middlewares/auth.js");
+const {
+  addCategory,
+  updateCategory,
+  getAllCategories,
+  deleteCategory,
+} = require("./category.controller.js");
 
-router.post("/categories", addCategory);
-router.put("/categories/:categoryId", updateCategory);
-router.get("/categories", getAllCategories);
-router.delete("/categories/:categoryId", deleteCategory);
+router.post("/add", isAuth(), addCategory);
+router.put("/update/:categoryId", isAuth(), updateCategory);
+router.get("/all", isAuth(), getAllCategories);
+router.delete("/delete/:categoryId", isAuth(), deleteCategory);
 
 module.exports = router;

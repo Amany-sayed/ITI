@@ -43,4 +43,4 @@ const orderSchema = new Schema(
   },
   { timestamps: true }
 );
-exports.Order = model("Order", orderSchema);
+module.exports= model("Order", orderSchema);

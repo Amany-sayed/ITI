@@ -10,7 +10,7 @@ const Product = require("./Modules/Product/product.route.js");
 const addRatingAndReview = require("./Modules/Rating/rating.route.js");
 const cartRouts = require("./Modules/Cart/cart.route.js");
 const Order = require("./Modules/Order/order.route.js");
-const auth = require("./Modules/Auth/auth.route.js");
+const auth = require("./Modules/Auth/auth.routes.js");
 const app = express();
 
 const URL = "mongodb://localhost:27017/E-commerce";
