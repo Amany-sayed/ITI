@@ -118,6 +118,12 @@ const login = async (req, res) => {
     });
     user.token = token;
     await user.save();
+    await res.cookie("userToken", token, {
+      // httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 48,
+      path: "/",
+      sameSite: "Lax",
+    });
     return res.status(200).json({
       message: "Login successful",
       token,
